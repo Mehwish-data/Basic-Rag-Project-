@@ -1,0 +1,11 @@
+streamlit
+langchain
+langchain-google-genai
+langchain-community
+python-dotenv
+chromadb
+google-generativeai
+langchain-ollama
+pdfminer.six
+Flask
+Flask-CORS
