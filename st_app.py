@@ -32,7 +32,13 @@ embedding = GoogleGenerativeAIEmbeddings(
 )
 
 # Initialize Chroma client and vectorstore
+import chromadb
+
+# Use PersistentClient (for saving data)
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
+
+# Then use the client with LangChain’s Chroma vectorstore
+from langchain_community.vectorstores import Chroma
 
 vectorstore = Chroma.from_documents(
     documents=docs,
@@ -40,7 +46,7 @@ vectorstore = Chroma.from_documents(
     collection_name="rag_demo",
     client=chroma_client
 )
-
+# Create retriever from vectorstore
 retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
 
 # Initialize LLM
@@ -96,4 +102,6 @@ if query:
                 st.markdown(doc.page_content)
 
         st.success("Done!")
+
+
 
