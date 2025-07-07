@@ -1,11 +1,13 @@
 streamlit
-langchain
-langchain-google-genai
-langchain-community
 python-dotenv
-chromadb
+langchain
+langchain-community
+langchain-core
+langchain-google-genai
 google-generativeai
+faiss-cpu
 langchain-ollama
 pdfminer.six
 Flask
 Flask-CORS
+
