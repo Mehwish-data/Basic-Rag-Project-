@@ -3,13 +3,12 @@ from dotenv import load_dotenv
 import streamlit as st
 
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain.vectorstores import FAISS
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableMap
-import chromadb
 
 # Load environment variables
 load_dotenv()
@@ -25,31 +24,17 @@ documents = loader.load()
 splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = splitter.split_documents(documents)
 
-# Initialize embeddings
+# Embedding model
 embedding = GoogleGenerativeAIEmbeddings(
     model="models/embedding-001",
     google_api_key=GOOGLE_API_KEY
 )
 
-# Initialize Chroma client and vectorstore
-import chromadb
-
-# Use PersistentClient (for saving data)
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
-
-# Then use the client with LangChain’s Chroma vectorstore
-from langchain_community.vectorstores import Chroma
-
-vectorstore = Chroma.from_documents(
-    documents=docs,
-    embedding=embedding,
-    collection_name="rag_demo",
-    client=chroma_client
-)
-# Create retriever from vectorstore
+# ✅ Use FAISS (cloud-compatible)
+vectorstore = FAISS.from_documents(docs, embedding)
 retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
 
-# Initialize LLM
+# LLM
 llm = ChatGoogleGenerativeAI(
     model="gemma-3n-e2b-it",
     temperature=0.2
@@ -67,7 +52,7 @@ Question:
 Answer:"""
 prompt = PromptTemplate.from_template(prompt_template)
 
-# RAG chain using Runnable
+# Chain
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
@@ -102,6 +87,7 @@ if query:
                 st.markdown(doc.page_content)
 
         st.success("Done!")
+
 
 
 
